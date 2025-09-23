@@ -94,21 +94,14 @@ def search_company_info(company_name, client):
     prompt = f"""
     Search for information about the pharmaceutical/biotech company "{company_name}" and provide the following details:
     
-    1. Sector: What pharmaceutical sector does this company work in? (e.g., oncology, neurology, rare diseases, etc.)
+    1. Sector: Categorize the company into these categories: Biotechnology, Pharmaceuticals, Diagnostics, Medical Devices, Digital Health, Research Tools, Contract Research Organization (CRO), Contract Manufacturing Organization (CMO), or Other.
     2. Funding: What type and level of funding has this company received? Include specific amounts, funding rounds (Series A, B, C, IPO), investors if available, and dates of funding rounds.
-    3. Location: Where is the company headquartered? 
-    4. Region: Where does the company primarily operate? (e.g., NA, EU, APAC, EMEA etc.)
-    5. AI Enabled: Is this company using AI in drug discovery or operations? Answer only "Yes" or "No"
-    6. CEO: What is the name of the current CEO?
-    7. CEO LinkedIn: Find the LinkedIn profile URL of the CEO that you found in the CEO field. You can find the profile by searching for the CEO + {company_name}. Provide the URL only.
-    8. CSO: What is the name of the Chief Scientific Officer (CSO)? 
-    9. CSO LinkedIn: Find the LinkedIn profile URL of the CSO that you found in the CSO field. You can find the profile by searching for the CSO + {company_name}. Provide the URL only.
-    10. Therapeutic Area: What therapeutic areas does the company focus on?
-    11. Molecule Focus: What type of molecules does the company focus on? (e.g., small molecules, antibodies, gene therapy, etc.)
-    12. Clinical Stage: What clinical trial stage are their lead programs in? (e.g., Preclinical, Phase 1, Phase 2, Phase 3, FDA approved)
-    13. Similar Companies: List 2-3 similar companies from external sources.
-    14. Competitive Landscape: Briefly describe the competitive landscape for this company.
-    15. Similar Stakeholders: List 2-3 similar stakeholders (e.g., investors, partners) associated with similar companies.
+    3. AI Enabled: Is this company using AI in drug discovery or operations? Answer only "Yes" or "No"
+    4. Category: Categorize the company into the following categories:
+                    i. Early Drug Discovery : Hit Discovery, Hit-To-Lead, Lead Optimization, Molecule Design, Pre Clinical Discovery, Exploratory Research.
+                    ii. Pre Clinical Development: In Vitro, In Vivo, ADME/Tox Profiling, Pharmacology, Pre Clinical Candidate Selection.
+                    iii. Other: Anything not covered above.
+
 
     For funding information, be as specific as possible with amounts and dates.
     If any information is not available, respond with "N/A" for that field.
@@ -117,19 +110,9 @@ def search_company_info(company_name, client):
     Example:
     Sector: Oncology
     Funding: Series B, $30M, 2022
-    Location: Boston, MA, USA
-    Region: NA
     AI Enabled: Yes
-    CEO: John Doe
-    CEO LinkedIn: https://www.linkedin.com/in/johndoe
-    CSO: Jane Smith
-    CSO LinkedIn: https://www.linkedin.com/in/janesmith
-    Therapeutic Area: Immuno-oncology
-    Molecule Focus: Small Molecules
-    Clinical Stage: Phase 2
-    Similar Companies: Company A, Company B, Company C
-    Competitive Landscape: Competes with Company X and Company Y in the immuno-oncology space
-    Similar Stakeholders: Investor 1, Partner 1, Investor 2
+    Category: Early Drug Discovery(Hit Discovery, Lead Optimization)
+  
     """
     
     try:
@@ -161,20 +144,8 @@ def parse_company_response(response_text, company_name):
         'Company Name': company_name,
         'Sector': 'N/A',
         'Funding': 'N/A',
-        'Location': 'N/A',
-        'Region': 'N/A',
         'AI Enabled': 'N/A',
-        'CEO': 'N/A',
-        'CEO LinkedIn': 'N/A',
-        'CSO': 'N/A',
-        'CSO LinkedIn': 'N/A',
-        'Therapeutic Area': 'N/A',
-        'Molecule Focus': 'N/A',
-        'Clinical Stage': 'N/A',
-        'Funding Citations': 'N/A',
-        'Similar Companies': 'N/A',
-        'Competitive Landscape': 'N/A',
-        'Similar Stakeholders': 'N/A'
+        'Category': 'N/A'
     }
     
     # Parse the response text
@@ -187,34 +158,11 @@ def parse_company_response(response_text, company_name):
             info['Sector'] = extract_value(line)
         elif 'funding:' in line_lower:
             info['Funding'] = extract_value(line)
-        elif 'location:' in line_lower or 'headquarter' in line_lower:
-            info['Location'] = extract_value(line)
         elif 'ai enabled:' in line_lower or 'ai-enabled:' in line_lower:
             value = extract_value(line).lower()
             info['AI Enabled'] = 'Yes' if 'yes' in value else 'No' if 'no' in value else 'N/A'
-        elif 'ceo:' in line_lower and 'linkedin' not in line_lower:
-            info['CEO'] = extract_value(line)
-        elif 'ceo linkedin:' in line_lower or ('ceo' in line_lower and 'linkedin' in line_lower):
-            info['CEO LinkedIn'] = extract_linkedin_url(line)
-        elif 'cso:' in line_lower and 'linkedin' not in line_lower:
-            info['CSO'] = extract_value(line)
-        elif 'cso linkedin:' in line_lower or ('cso' in line_lower and 'linkedin' in line_lower):
-            info['CSO LinkedIn'] = extract_linkedin_url(line)
-        elif 'therapeutic' in line_lower:
-            info['Therapeutic Area'] = extract_value(line)
-        elif 'molecule' in line_lower:
-            info['Molecule Focus'] = extract_value(line)
-        elif 'clinical' in line_lower and 'stage' in line_lower:
-            info['Clinical Stage'] = extract_value(line)
-        elif 'region:' in line_lower:
-            info['Region'] = extract_value(line)
-        elif 'similar companies:' in line_lower:
-            info['Similar Companies'] = extract_value(line)
-        elif 'competitive landscape:' in line_lower:
-            info['Competitive Landscape'] = extract_value(line)
-        elif 'similar stakeholders:' in line_lower:
-            info['Similar Stakeholders'] = extract_value(line)
-    
+        elif 'category:' in line_lower:
+            info['Category'] = extract_value(line)
     return info
 
 def extract_value(line):
@@ -248,19 +196,8 @@ def create_empty_company_info(company_name):
         'Sector': 'N/A',
         'Funding': 'N/A',
         'Funding Citations': 'N/A',
-        'Location': 'N/A',
-        'Region': 'N/A',
         'AI Enabled': 'N/A',
-        'CEO': 'N/A',
-        'CEO LinkedIn': 'N/A',
-        'CSO': 'N/A',
-        'CSO LinkedIn': 'N/A',
-        'Therapeutic Area': 'N/A',
-        'Molecule Focus': 'N/A',
-        'Clinical Stage': 'N/A',
-        'Similar Companies': 'N/A',
-        'Competitive Landscape': 'N/A',
-        'Similar Stakeholders': 'N/A'
+        'Category': 'N/A'
     }
 
 def process_companies_csv(input_file, output_file='augmented_companies.csv'):
@@ -323,9 +260,8 @@ def process_companies_csv(input_file, output_file='augmented_companies.csv'):
     
     # Reorder columns to put the augmented fields first (including Funding Citations)
     desired_columns = [
-        'Company Name', 'Sector', 'Funding', 'Funding Citations', 'Location', 'Region', 'AI Enabled',
-        'CEO', 'CEO LinkedIn', 'CSO', 'CSO LinkedIn',
-        'Therapeutic Area', 'Molecule Focus', 'Clinical Stage', 'Similar Companies', 'Competitive Landscape', 'Similar Stakeholders'
+        'Company Name', 'Sector', 'Funding', 'Funding Citations', 'AI Enabled',
+        'Category'
     ]
     
     # Add any additional columns from original data
@@ -333,18 +269,15 @@ def process_companies_csv(input_file, output_file='augmented_companies.csv'):
     final_columns = desired_columns + other_columns
     
     augmented_df = augmented_df[final_columns]
+
+    # augmented_df = augmented_df[["AI Enabled"] == 'No']
     
     # Save to CSV
     augmented_df.to_csv(output_file, index=False)
     print(f"\n✅ Augmented data saved to: {output_file}")
     
     # Print summary statistics
-    print(f"\nSummary:")
-    print(f"- Total companies processed: {len(augmented_df)}")
-    print(f"- AI-enabled companies: {(augmented_df['AI Enabled'] == 'Yes').sum()}")
-    print(f"- Companies with CEO info: {(augmented_df['CEO'] != 'N/A').sum()}")
-    print(f"- Companies with CSO info: {(augmented_df['CSO'] != 'N/A').sum()}")
-    print(f"- Companies with funding citations: {(augmented_df['Funding Citations'] != 'N/A').sum()}")
+
     
     return augmented_df
 
