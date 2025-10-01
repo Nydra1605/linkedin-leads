@@ -35,7 +35,7 @@ class Config:
     """Configuration settings for the agent"""
     AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY", "your-api-key")
     AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "https://your-resource.openai.azure.com/")
-    AZURE_OPENAI_API_VERSION = "2024-02-15-preview"
+    AZURE_OPENAI_API_VERSION = "2023-07-01-preview"
     AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o")
     
     SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY", "your-serpapi-key")
@@ -390,13 +390,15 @@ async def lookup_single_company(company_name: str):
 # Example usage
 if __name__ == "__main__":
     # Set up environment variables
-    os.environ["AZURE_OPENAI_API_KEY"] = "your-azure-openai-api-key"
-    os.environ["AZURE_OPENAI_ENDPOINT"] = "https://your-resource.openai.azure.com/"
-    os.environ["AZURE_OPENAI_DEPLOYMENT"] = "gpt-4o"
-    os.environ["SERPAPI_API_KEY"] = "your-serpapi-key"
+    AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+    AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+    AZURE_OPENAI_API_VERSION = "2023-07-01-preview"
+    AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+    
+    SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY", "your-serpapi-key")
     
     # Run the augmentation
-    asyncio.run(augment_company_data("test.csv", "augmented.csv"))
+    asyncio.run(augment_company_data("serp_test.csv", "serp_augmented.csv"))
     
     # Or lookup a single company
     # result = asyncio.run(lookup_single_company("2seventy bio inc"))
