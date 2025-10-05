@@ -9,7 +9,7 @@ import os
 import csv
 
 # Configure the client
-client = genai.Client(api_key="AIzaSyA5WI4IqUlXw24Ln1mjUkDnIOFwKiqb6ek")
+client = genai.Client(api_key="")
 
 def clean_company_name(name):
     """Clean company name for better search results"""
@@ -95,26 +95,7 @@ def search_company_info(company_name, client):
     
     # Create a detailed prompt to extract specific information
     prompt = f"""
-    Search for information about the pharmaceutical/biotech company "{company_name}" and provide the following details:
-    
-    1. Sector: Categorize the company into these categories: Biotechnology, Pharmaceuticals, Diagnostics, Medical Devices, Digital Health, Research Tools, Contract Research Organization (CRO), Contract Manufacturing Organization (CMO), or Other.
-    2. Funding: What type and level of funding has this company received? Include specific amounts, funding rounds (Series A, B, C, IPO), investors if available, and dates of funding rounds.
-    3. AI Enabled: Is this company using AI in drug discovery or operations? Answer only "Yes" or "No"
-    4. Category: Categorize the company into the following categories:
-                    i. Early Drug Discovery : Hit Discovery, Hit-To-Lead, Lead Optimization, Molecule Design, Pre Clinical Discovery, Exploratory Research.
-                    ii. Pre Clinical Development: In Vitro, In Vivo, ADME/Tox Profiling, Pharmacology, Pre Clinical Candidate Selection.
-                    iii. Other: Anything not covered above.
-
-
-    For funding information, be as specific as possible with amounts and dates.
-    If any information is not available, respond with "N/A" for that field.
-    Format the response as a clear list with labels.
-
-    Example:
-    Sector: Oncology
-    Funding: Series B, $30M, 2022
-    AI Enabled: Yes
-    Category: Early Drug Discovery(Hit Discovery, Lead Optimization)
+       
   
     """
     
