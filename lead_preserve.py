@@ -9,7 +9,7 @@ import os
 import csv
 
 # Configure the client
-client = genai.Client(api_key="")
+client = genai.Client(api_key="AIzaSyA5WI4IqUlXw24Ln1mjUkDnIOFwKiqb6ek")
 
 def clean_company_name(name):
     """Clean company name for better search results"""
@@ -334,7 +334,7 @@ def process_companies_csv(input_file, output_file='augmented_companies.csv'):
 if __name__ == "__main__":
     # Specify your input CSV file
     input_csv = "test.csv"  # Change this to your CSV file name
-    output_csv = "augmented_pharma_companies.csv"  # Output file name
+    output_csv = "augmented_companies.csv"  # Output file name
     
     # Process the companies
     result_df = process_companies_csv(input_csv, output_csv)
