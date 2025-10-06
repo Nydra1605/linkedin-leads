@@ -108,10 +108,10 @@ def extract_company_info_with_llm(context: str, source_urls: list, company_name:
     {', '.join(source_urls)}
 
     Data Points to Extract:
-    1. "sector": A 1-2 word industry sector (e.g., 'Artificial Intelligence', 'Cloud Computing').
-    2. "funding": The latest funding amount or stage (e.g., '$500M', 'Series C'). If not found, use "Not Found".
+    1. "sector": Categorize the companies into one of the following sectors: "Biotechnology", "Pharmaceuticals" or "Others".
+    2. "funding": Provide the Funding Amount in USD, convert if required. Also provide the Funding Stage from the following options: "Seed", "Series A", "Series B", "Series C", "Series D", "Series E", "Series F", "IPO", "Acquired". The output should be in the following format: $10M, Series A. If no funding information is found, use "Not Found".
     3. "funding_citation": The exact URL from the source list that contains the funding information. If not found, use "Not Found".
-    4. "ai_enabled": Answer "Yes" if the company's core product is AI-based, otherwise "No".
+    4. "ai_enabled": If the company is using AI in any capacity, return "Yes". If not, return "No". 
 
     --- START OF PROVIDED TEXT ---
     {context[:24000]}
@@ -124,7 +124,7 @@ def extract_company_info_with_llm(context: str, source_urls: list, company_name:
         response = client.chat.completions.create(
             model=AZURE_OPENAI_DEPLOYMENT_NAME,
             messages=[
-                {"role": "system", "content": "You are a precise financial and tech analyst that extracts data and returns it in JSON format."},
+                {"role": "system", "content": "You are a precise pharmaceutical company data scraper that extracts data and returns it in JSON format."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.2,
@@ -136,7 +136,7 @@ def extract_company_info_with_llm(context: str, source_urls: list, company_name:
         print(f"❌ Error during LLM analysis for {company_name}: {e}")
         return None
 
-def save_to_csv(data: dict, company_name: str, filename: str = "serp_output3.csv"):
+def save_to_csv(data: dict, company_name: str, filename: str = "serp_output2.csv"):
     """Appends the extracted company data to a CSV file."""
     fieldnames = ['company_name', 'sector', 'funding', 'funding_citation', 'ai_enabled']
     file_exists = os.path.isfile(filename)
@@ -212,7 +212,7 @@ def process_company_data(company_name: str):
         }
         save_to_csv(default_data, company_name)
 
-def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "serp_output3.csv"):
+def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "serp_output2.csv"):
     """
     Reads company names from a CSV file and processes each one.
     

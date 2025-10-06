@@ -108,10 +108,10 @@ def extract_company_info_with_llm(context: str, source_urls: list, company_name:
     {', '.join(source_urls)}
 
     Data Points to Extract:
-    1. "sector": A 1-2 word industry sector (e.g., 'Artificial Intelligence', 'Cloud Computing').
-    2. "funding": The latest funding amount or stage (e.g., '$500M', 'Series C'). If not found, use "Not Found".
+    1. "sector": Categorize the companies into one of the following sectors: "Biotechnology", "Pharmaceuticals" or "Others".
+    2. "funding": Provide the Funding Amount in USD, convert if required. Also provide the Funding Stage from the following options: "Seed", "Series A", "Series B", "Series C", "Series D", "Series E", "Series F", "IPO", "Acquired". The output should be in the following format: $10M, Series A. If no funding information is found, use "Not Found".
     3. "funding_citation": The exact URL from the source list that contains the funding information. If not found, use "Not Found".
-    4. "ai_enabled": Answer "Yes" if the company's core product is AI-based, otherwise "No".
+    4. "ai_enabled": If the company is using AI in any capacity, return "Yes". If not, return "No". 
 
     --- START OF PROVIDED TEXT ---
     {context[:24000]}
@@ -124,7 +124,7 @@ def extract_company_info_with_llm(context: str, source_urls: list, company_name:
         response = client.chat.completions.create(
             model=AZURE_OPENAI_DEPLOYMENT_NAME,
             messages=[
-                {"role": "system", "content": "You are a precise financial and tech analyst that extracts data and returns it in JSON format."},
+                {"role": "system", "content": "You are a precise pharmaceutical company data scraper that extracts data and returns it in JSON format."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.2,
@@ -136,7 +136,7 @@ def extract_company_info_with_llm(context: str, source_urls: list, company_name:
         print(f"❌ Error during LLM analysis for {company_name}: {e}")
         return None
 
-def save_to_csv(data: dict, company_name: str, filename: str = "serp_output3.csv"):
+def save_to_csv(data: dict, company_name: str, filename: str = "job1_output.csv"):
     """Appends the extracted company data to a CSV file."""
     fieldnames = ['company_name', 'sector', 'funding', 'funding_citation', 'ai_enabled']
     file_exists = os.path.isfile(filename)
@@ -147,6 +147,30 @@ def save_to_csv(data: dict, company_name: str, filename: str = "serp_output3.csv
             writer.writeheader()
         writer.writerow({'company_name': company_name, **data})
     print(f"✅ Data for {company_name} appended successfully to {filename}")
+
+def get_processed_companies(output_csv_file: str) -> set:
+    """
+    Reads the output CSV file and returns a set of already processed company names.
+    
+    Args:
+        output_csv_file: Path to the output CSV file
+        
+    Returns:
+        Set of company names that have already been processed
+    """
+    if not os.path.exists(output_csv_file):
+        return set()
+    
+    try:
+        df = pd.read_csv(output_csv_file)
+        if 'company_name' in df.columns:
+            processed = set(df['company_name'].dropna().unique())
+            print(f"📋 Found {len(processed)} already processed companies in output file")
+            return processed
+        return set()
+    except Exception as e:
+        print(f"⚠️ Warning: Could not read existing output file: {e}")
+        return set()
 
 def process_company_data(company_name: str):
     """
@@ -212,9 +236,10 @@ def process_company_data(company_name: str):
         }
         save_to_csv(default_data, company_name)
 
-def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "serp_output3.csv"):
+def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "job1_output.csv"):
     """
     Reads company names from a CSV file and processes each one.
+    Automatically resumes from where it left off if the script was interrupted.
     
     Args:
         input_csv_file: Path to CSV file containing company names in 'Lead_Company' column
@@ -231,24 +256,48 @@ def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "serp
             return
         
         # Get unique company names
-        companies = df['Lead_Company'].dropna().unique()
-        total_companies = len(companies)
+        all_companies = df['Lead_Company'].dropna().unique()
         
-        print(f"\n🚀 Found {total_companies} unique companies to process")
-        print(f"Output will be saved to: {output_csv_file}")
+        # Get already processed companies
+        processed_companies = get_processed_companies(output_csv_file)
         
-        # Clear the output file if it exists (optional - remove if you want to append)
-        if os.path.exists(output_csv_file):
-            os.remove(output_csv_file)
-            print(f"Cleared existing output file: {output_csv_file}")
+        # Filter out already processed companies
+        companies_to_process = [c for c in all_companies if c not in processed_companies]
         
-        # Process each company
-        for idx, company in enumerate(companies, 1):
-            print(f"\n📊 Progress: {idx}/{total_companies}")
-            process_company_data(company)
+        total_companies = len(all_companies)
+        remaining_companies = len(companies_to_process)
+        completed_companies = len(processed_companies)
+        
+        print(f"\n🚀 Processing Summary:")
+        print(f"   Total companies in input: {total_companies}")
+        print(f"   Already processed: {completed_companies}")
+        print(f"   Remaining to process: {remaining_companies}")
+        print(f"   Output file: {output_csv_file}")
+        
+        if remaining_companies == 0:
+            print("\n✨ All companies have already been processed!")
+            return
+        
+        # Process each remaining company
+        for idx, company in enumerate(companies_to_process, 1):
+            overall_progress = completed_companies + idx
+            print(f"\n📊 Progress: {overall_progress}/{total_companies} (Processing {idx}/{remaining_companies} remaining)")
+            
+            try:
+                process_company_data(company)
+            except Exception as e:
+                print(f"❌ Error processing {company}: {e}")
+                # Save error entry to maintain progress tracking
+                error_data = {
+                    'sector': 'Error',
+                    'funding': 'Error',
+                    'funding_citation': 'Error',
+                    'ai_enabled': 'Error'
+                }
+                save_to_csv(error_data, company, output_csv_file)
             
             # Add a small delay to avoid rate limiting
-            if idx < total_companies:
+            if idx < remaining_companies:
                 sleep(2)  # 2 second delay between companies
         
         print(f"\n✨ Processing complete! Results saved to {output_csv_file}")
@@ -256,10 +305,11 @@ def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "serp
         # Display summary
         if os.path.exists(output_csv_file):
             results_df = pd.read_csv(output_csv_file)
-            print(f"\n📈 Summary:")
-            print(f"Total companies processed: {len(results_df)}")
-            print(f"Companies with funding data: {(results_df['funding'] != 'Not Found').sum()}")
-            print(f"AI-enabled companies: {(results_df['ai_enabled'] == 'Yes').sum()}")
+            print(f"\n📈 Final Summary:")
+            print(f"   Total companies processed: {len(results_df)}")
+            print(f"   Companies with funding data: {(results_df['funding'] != 'Not Found').sum()}")
+            print(f"   AI-enabled companies: {(results_df['ai_enabled'] == 'Yes').sum()}")
+            print(f"   Errors encountered: {(results_df['sector'] == 'Error').sum()}")
             
     except FileNotFoundError:
         print(f"❌ Error: Input file '{input_csv_file}' not found.")
@@ -269,8 +319,8 @@ def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "serp
 # --- Main Execution ---
 if __name__ == "__main__":
     # Specify your input CSV file path
-    INPUT_CSV_FILE = "serp_test.csv"  # Change this to your actual file path
-    OUTPUT_CSV_FILE = "serp_output2.csv"  # Output file name
+    INPUT_CSV_FILE = "job1.csv"  # Change this to your actual file path
+    OUTPUT_CSV_FILE = "job1_output.csv"  # Output file name
     
     # Process all companies from the CSV
     process_companies_from_csv(INPUT_CSV_FILE, OUTPUT_CSV_FILE)
