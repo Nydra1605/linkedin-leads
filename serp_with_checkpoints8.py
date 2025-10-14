@@ -136,7 +136,7 @@ def extract_company_info_with_llm(context: str, source_urls: list, company_name:
         print(f"❌ Error during LLM analysis for {company_name}: {e}")
         return None
 
-def save_to_csv(data: dict, company_name: str, filename: str = "job4_output.csv"):
+def save_to_csv(data: dict, company_name: str, filename: str = "job8_output.csv"):
     """Appends the extracted company data to a CSV file."""
     fieldnames = ['company_name', 'sector', 'funding', 'funding_citation', 'ai_enabled']
     file_exists = os.path.isfile(filename)
@@ -236,7 +236,7 @@ def process_company_data(company_name: str):
         }
         save_to_csv(default_data, company_name)
 
-def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "job4_output.csv"):
+def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "job8_output.csv"):
     """
     Reads company names from a CSV file and processes each one.
     Automatically resumes from where it left off if the script was interrupted.
@@ -319,8 +319,8 @@ def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "job4
 # --- Main Execution ---
 if __name__ == "__main__":
     # Specify your input CSV file path
-    INPUT_CSV_FILE = "job4.csv"  # Change this to your actual file path
-    OUTPUT_CSV_FILE = "job4_output.csv"  # Output file name
+    INPUT_CSV_FILE = "job8.csv"  # Change this to your actual file path
+    OUTPUT_CSV_FILE = "job8_output.csv"  # Output file name
     
     # Process all companies from the CSV
     process_companies_from_csv(INPUT_CSV_FILE, OUTPUT_CSV_FILE)
