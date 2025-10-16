@@ -1,8 +1,13 @@
 import requests
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+api_key = os.getenv("SERPHOUSE_API_KEY")
 
 payload = {
     "data":{
-    "q": "openai",
+    "q": "aurigene oncology latest project",
     "domain": "google.com",
     "loc": "United States",
     "lang": "en",
@@ -15,7 +20,7 @@ url = "https://api.serphouse.com/serp/live"
 headers={
     'accept': 'application/json',
     'content-type': 'application/json',
-    'authorization': "Bearer j1f2DhSUDBVeAfJINIlKDe63x4cPH1R8JnsJ9mFDf9PFVt1mTUBwadhUAdjC"
+    'authorization': f"Bearer {api_key}"
 }
 
 response = requests.post(url, headers=headers, json=payload)
