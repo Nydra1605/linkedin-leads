@@ -1,0 +1,10 @@
+company_name,website_timestamp,small_molecules,peptides,proteins,antibodies,antibody_conjugates,fusion_proteins,nucleic_acid_therapeutics,gene_cell_therapies,vaccines,protein_degraders,other_modalities
+23 century clinic,"Wed, 15 Oct 2025 10:15:21 GMT",No,No,No,No,No,No,No,Yes,No,No,No
+nexcella inc,Error accessing website,No,No,No,No,No,No,No,Yes,No,No,No
+targazyme inc,2023-10-10,Yes,No,Yes,No,No,No,No,Yes,No,No,No
+shenzhen pregene biopharma co ltd,2022-04-06 08:30:00,No,No,No,Yes,No,No,No,Yes,No,No,No
+biotherapy services ltd,2025-09-24 00:00:00,No,No,No,No,No,No,No,No,No,No,Yes
+carsgen therapeutics ltd,2025-08-14 20:15:00,No,No,No,No,No,No,No,Yes,No,No,No
+dc prime bv,No timestamp found,No,No,No,No,No,No,No,Yes,Yes,No,No
+abelzeta inc,2023-12-15 00:00:00,No,No,No,No,No,No,No,Yes,No,No,No
+mana therapeutics inc,Error: Connection failed - 403 Client Error: Forbidden for url: https://www.b,No,No,No,No,No,No,No,Yes,No,No,No

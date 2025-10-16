@@ -1,0 +1,10 @@
+company_name,research_stage,peptide_source_link,small_molecules,peptides,proteins,antibodies,antibody_conjugates,fusion_proteins,nucleic_acid_therapeutics,gene_cell_therapies,vaccines,protein_degraders,other_modalities
+23 century clinic,Clinical (Phase I–III),Not found,No,No,Yes (interleukin),Yes (bispecific antibodies),No,No,No,Yes (CAR-T),No,No,No
+nexcella inc,Clinical (Phase I–III),Not found,No,No,No,No,No,No,No,Yes (CAR-T),No,No,No
+targazyme inc,Clinical (Phase I–III),Not found,Yes (small molecule),No,No,No,No,No,No,Yes (gene therapy),No,No,No
+shenzhen pregene biopharma co ltd,Clinical (Phase I–III),Not found,No,No,No,Yes (nanobody),No,No,No,Yes (CAR-T),No,No,No
+biotherapy services ltd,Clinical (Phase I–III),Not found,No,No,No,No,No,No,No,No,No,No,No
+carsgen therapeutics ltd,Clinical (Phase I–III),Not found,No,No,Yes (cytokine),No,No,No,No,Yes (CAR-T),No,No,No
+dc prime bv,Preclinical,https://www.bionity.com/en/companies/1040181/dcprime-bv.html,No,Yes (peptide),No,No,No,No,No,No,No,No,No
+abelzeta inc,Preclinical,Not found,No,No,No,No,No,No,No,Yes (CAR-T),No,No,No
+mana therapeutics inc,Preclinical,Not found,No,No,Yes (interleukin),Yes (monoclonal antibodies),No,No,No,Yes (gene therapy),No,No,Yes (nanoparticles)
