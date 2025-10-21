@@ -1138,8 +1138,8 @@ def process_companies_from_csv(input_csv_file: str, output_csv_file: str = "ther
 # --- Main Execution ---
 if __name__ == "__main__":
     # Specify your input CSV file path
-    INPUT_CSV_FILE = "1job.csv"  # Change this to your actual file path
-    OUTPUT_CSV_FILE = "segment_output.csv"  # Enhanced output file name
+    INPUT_CSV_FILE = "2job.csv"  # Change this to your actual file path
+    OUTPUT_CSV_FILE = "segment_output2.csv"  # Enhanced output file name
     
     # Process all companies from the CSV
     process_companies_from_csv(INPUT_CSV_FILE, OUTPUT_CSV_FILE)
